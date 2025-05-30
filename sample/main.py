@@ -13,26 +13,21 @@ tasks = []
 
 def main():
     load_tasks()
-    while True:
-        print("\nTask Tracker Menu:")
-        print("1. Add Task")
-        print("2. View Tasks")
-        print("3. Mark Task as Done")
-        print("4. Save and Exit")
-
-        choice = input("Choose an option (1-4): ")
+    print(MENU)
+    choice = input("Choose an option (1-4): ")
+    while choice != '4':
         if choice == '1':
             add_task()
         elif choice == '2':
             view_tasks()
         elif choice == '3':
             mark_task_done()
-        elif choice == '4':
-            save_tasks()
-            print("Tasks saved. Goodbye!")
-            break
         else:
             print("Invalid choice. Try again.")
+        print(MENU)
+        choice = input("Choose an option (1-4): ")
+    save_tasks()
+    print("Tasks saved. Goodbye!")
 
 def add_task():
     task = input("Enter task description: ")
