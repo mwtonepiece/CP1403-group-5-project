@@ -95,9 +95,14 @@ def save_tasks():
 
 def load_tasks():
     try:
-        with open("tasks.json", "r") as f:
+        with open("tasks.json", "r") as in_file:
             global tasks
-            tasks = json.load(f)
+            tasks = json.load(in_file)
+            today = datetime.today().date()
+            overdue = [task for task in tasks if not task['done']
+                       and datetime.strptime(task['due'], "%Y-%m-%d").date() < today]
+            if overdue:
+                print(Fore.RED + f"⚠️ You have {len(overdue)} overdue task(s)!")
     except FileNotFoundError:
         tasks.clear()
 
