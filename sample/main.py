@@ -90,8 +90,8 @@ def mark_task_done():
 
 def save_tasks():
     sorted_tasks = sorted(tasks, key=lambda t: t['due'])
-    with open("tasks.json", "w") as f:
-        json.dump(sorted_tasks, f, indent=4)
+    with open("tasks.json", "w") as out_file:
+        json.dump(sorted_tasks, out_file, indent=4)
 
 def load_tasks():
     try:
