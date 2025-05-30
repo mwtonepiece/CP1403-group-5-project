@@ -2,6 +2,12 @@ import json
 from datetime import datetime, timedelta
 from colorama import Fore, Style, init
 
+MENU=("Task Tracker Menu:"
+      "\n1. Add Task"
+      "\n2. View Tasks"
+      "\n3. Mark Task as Done"
+      "\n4. Save and Exit")
+
 init(autoreset=True)
 tasks = []
 
