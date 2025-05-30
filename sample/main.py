@@ -32,6 +32,9 @@ def main():
 
 def add_task():
     task = input("Enter task description: ")
+    if not task:
+        print("Task description cannot be empty.")
+        return
     due = input("Enter due date (YYYY-MM-DD): ")
     try:
        due_date =  datetime.strptime(due, "%Y-%m-%d").date()
