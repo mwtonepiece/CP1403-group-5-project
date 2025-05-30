@@ -24,6 +24,7 @@ def main():
             mark_task_done()
         else:
             print("Invalid choice. Try again.")
+        print()
         print(MENU)
         choice = input("Choose an option (1-4): ")
     save_tasks()
@@ -85,8 +86,9 @@ def mark_task_done():
         print("Invalid input. Must be a number.")
 
 def save_tasks():
+    sorted_tasks = sorted(tasks, key=lambda t: t['due'])
     with open("tasks.json", "w") as f:
-        json.dump(tasks, f)
+        json.dump(sorted_tasks, f, indent=4)
 
 def load_tasks():
     try:
