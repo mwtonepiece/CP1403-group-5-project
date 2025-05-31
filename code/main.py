@@ -28,20 +28,20 @@ def main():
         else:
             print("Invalid choice. Try again.")
 
-def add_task():
-    task = input("Enter task description: ")
-    due = input("Enter due date (YYYY-MM-DD): ")
-    try:
-       due_date =  datetime.strptime(due, "%Y-%m-%d").date()
-    except ValueError:
-        print("Invalid date format.")
-        return
-    tasks.append({
-        'description': task,
-        'due': str(due_date),
-        'done': False
-    })
-    print("Task added!")
+# def add_task():
+#     task = input("Enter task description: ")
+#     due = input("Enter due date (YYYY-MM-DD): ")
+#     try:
+#        due_date =  datetime.strptime(due, "%Y-%m-%d").date()
+#     except ValueError:
+#         print("Invalid date format.")
+#         return
+#     tasks.append({
+#         'description': task,
+#         'due': str(due_date),
+#         'done': False
+#     })
+#     print("Task added!")
 
 def view_tasks():
     if not tasks:
