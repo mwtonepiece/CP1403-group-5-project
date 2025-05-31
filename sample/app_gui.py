@@ -1,72 +1,93 @@
 import tkinter as tk
 from tkinter import messagebox, simpledialog
-import json
+from main import tasks, save_tasks, load_tasks  # Reusing shared data and functions
 from datetime import datetime
 
-tasks = []
+# --- Function to refresh the listbox with current tasks ---
+def refresh_task_list():
+    listbox.delete(0, tk.END)  # Clear the listbox
 
-def load_tasks():
-    global tasks
-    try:
-        with open("tasks.json", "r") as f:
-            tasks = json.load(f)
-    except FileNotFoundError:
-        tasks = []
+    for i, task in enumerate(tasks):
+        status = '✅' if task['done'] else '❌'  # Visual task status
+        listbox.insert(tk.END, f"{i + 1}. {task['description']} (Due: {task['due']}) {status}")
 
-def save_tasks():
-    with open("tasks.json", "w") as f:
-        json.dump(tasks, f)
-
-def refresh_listbox():
-    listbox.delete(0, tk.END)
-    sorted_tasks = sorted(tasks, key=lambda t: t['due'])
-    for i, task in enumerate(sorted_tasks):
-        status = "✓" if task['done'] else "✗"
-        listbox.insert(tk.END, f"{i+1}. {task['description']} (Due: {task['due']}) [{status}]")
-
+# --- Function triggered when user clicks "Add Task" button ---
 def add_task():
+    # Ask for task description
     desc = simpledialog.askstring("Add Task", "Task description:")
     if not desc:
-        return
-    due = simpledialog.askstring("Add Task", "Due date (YYYY-MM-DD):")
+        return  # Cancel if nothing entered
+
+    # Ask for due date
+    due = simpledialog.askstring("Due Date", "Enter due date (YYYY-MM-DD):")
+    if not due:
+        return  # Cancel if nothing entered
+
+    # Validate date format
     try:
-        datetime.strptime(due, "%Y-%m-%d")  # Validate format
+        datetime.strptime(due, "%Y-%m-%d")
     except ValueError:
-        messagebox.showerror("Invalid date", "Date must be in YYYY-MM-DD format.")
+        messagebox.showerror("Error", "Invalid date format.")
         return
-    tasks.append({'description': desc, 'due': due, 'done': False})
-    refresh_listbox()
 
+    # Add the task to the shared tasks list
+    tasks.append({
+        'description': desc,
+        'due': due,
+        'done': False
+    })
+
+    refresh_task_list()  # Update listbox after adding
+
+# --- Function to mark selected task as done ---
 def mark_done():
-    index = listbox.curselection()
-    if not index:
-        return
-    sorted_tasks = sorted(tasks, key=lambda t: t['due'])
-    task_index = tasks.index(sorted_tasks[index[0]])
-    tasks[task_index]['done'] = True
-    refresh_listbox()
+    try:
+        # Get index of selected task
+        selection = listbox.curselection()[0]
 
-def on_closing():
-    save_tasks()
-    root.destroy()
+        # Sort tasks again to match listbox order
+        sorted_tasks = sorted(tasks, key=lambda t: t['due'])
+        task = sorted_tasks[selection]
 
-# GUI setup
+        # Find original index in the unsorted list to update it
+        index = tasks.index(task)
+        tasks[index]['done'] = True  # Mark as done
+
+        refresh_task_list()  # Update UI
+    except IndexError:
+        messagebox.showwarning("Select Task", "No task selected.")
+
+# --- Function to save and exit the program ---
+def closing():
+    save_tasks()  # Save tasks to JSON file
+    root.destroy()  # Close the app window
+
+# --- Load saved tasks before launching GUI ---
+load_tasks()
+
+# --- GUI Setup ---
 root = tk.Tk()
-root.title("Task Tracker")
+root.title("Task Tracker")  # Window title
 
-frame = tk.Frame(root)
-frame.pack(pady=10)
+# Main container frame
+frame = tk.Frame(root, padx=10, pady=10)
+frame.pack()
 
-listbox = tk.Listbox(frame, width=50)
+# Listbox to show task list
+listbox = tk.Listbox(frame, width=60)
 listbox.pack()
 
-button_frame = tk.Frame(root)
-button_frame.pack()
+# Button row container
+btn_frame = tk.Frame(frame)
+btn_frame.pack(pady=5)
 
-tk.Button(button_frame, text="Add Task", command=add_task).grid(row=0, column=0, padx=5)
-tk.Button(button_frame, text="Mark as Done", command=mark_done).grid(row=0, column=1, padx=5)
+# Add buttons and connect them to functions
+tk.Button(btn_frame, text="Add Task", width=15, command=add_task).pack(side=tk.LEFT, padx=5)
+tk.Button(btn_frame, text="Mark as Done", width=15, command=mark_done).pack(side=tk.LEFT, padx=5)
+tk.Button(btn_frame, text="Save & Quit", width=15, command=closing).pack(side=tk.LEFT, padx=5)
 
-load_tasks()
-refresh_listbox()
-root.protocol("WM_DELETE_WINDOW", on_closing)
+# Populate the listbox with any loaded tasks
+refresh_task_list()
+
+# --- Start the GUI event loop ---
 root.mainloop()
